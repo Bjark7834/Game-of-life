@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Game_of_life
 {
@@ -11,7 +12,8 @@ namespace Game_of_life
 
         bool[,] GameBoard = new bool[MaxX, MaxY];
         bool[,] TempBoard = new bool[MaxX, MaxY];
-        Random rnd = new Random(1);
+        // use time-based seed so the board is different each run
+        Random rnd = new Random();
         bool boolvalue;
         int ForT = 1;
         
@@ -22,25 +24,20 @@ namespace Game_of_life
             
             
             // initialize the game board with random values
+            
             for (int y = 0; y < MaxY; y++)
             {
                 for (int x = 0; x < MaxX; x++)
                 {
 
 
+                    // rnd.Next(1) returns only 0. Use 2 to get 0 or 1.
                     ForT = rnd.Next(2);
-                    if (ForT == 0)
-                    {
-                        boolvalue = false;
-                    }
-                    else
-                    {
-                        boolvalue = true;
-                    }
+                    boolvalue = ForT == 1;
                     GameBoard[x, y] = boolvalue;
                 }
             }
-
+            
 
 
             //flying machine
@@ -103,28 +100,16 @@ namespace Game_of_life
                     for (int x = 0; x < MaxX; x++)
                     {
                         int Neighbor = countNeighbors(GameBoard, x, y);
-
-                        if (GameBoard[x, y] == true)
+                        // rules of Conway's Game of Life
+                        if (GameBoard[x, y])
                         {
-                            if (Neighbor < 2)
-                            {
-                                TempBoard[x, y] = false;
-                            }
-
-                            else if (Neighbor > 3)
-                            {
-                                TempBoard[x, y] = false;
-                            }
-
-
+                            // live cell survives only with 2 or 3 neighbors
+                            TempBoard[x, y] = (Neighbor == 2 || Neighbor == 3);
                         }
-
                         else
                         {
-                            if (Neighbor == 3)
-                            {
-                                TempBoard[x, y] = true;
-                            }
+                            // dead cell becomes alive only with exactly 3 neighbors
+                            TempBoard[x, y] = (Neighbor == 3);
                         }
                     }
 
@@ -133,9 +118,10 @@ namespace Game_of_life
                 copyBoard(TempBoard, GameBoard);
                 Console.SetCursorPosition(0, 0);
                 Thread.Sleep(500);
+                
             }
         }
-
+        //generate random game board and print it to the console
         void printBoard(bool[,] board)
         {
             StringBuilder gameString = new StringBuilder();
