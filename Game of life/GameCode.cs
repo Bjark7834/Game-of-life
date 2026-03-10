@@ -20,7 +20,7 @@ namespace Game_of_life
         public void run()
         {
             
-
+            
             // initialize the game board with random values
             for (int y = 0; y < MaxY; y++)
             {
@@ -91,7 +91,7 @@ namespace Game_of_life
             }
             return 0;
         }
-        //test
+        
         // run the game for x generations
         void runGenerations(int generations)
         {
