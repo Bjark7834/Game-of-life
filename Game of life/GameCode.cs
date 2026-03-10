@@ -14,14 +14,8 @@ namespace Game_of_life
         Random rnd = new Random(1);
         bool boolvalue;
         int ForT = 1;
-        bool loop = true;
+        
         int Generations = 0;
-
-
-        public GameCode() 
-        {
-            
-        }
 
         public void run()
         {
@@ -60,22 +54,23 @@ namespace Game_of_life
 
 
             // print the game board
-
-            for (int y = 0; y < MaxY; y++)
-            {
-                for (int x = 0; x < MaxX; x++)
-                {
-                    Console.Write(GameBoard[x, y] ? "█" : "▒");
-                }
-
-                Console.WriteLine();
-            }
+            printBoard(GameBoard);
 
 
 
-            
+
             Console.WriteLine("Enter number of Generations");
+            Generations = getNumber();
+            Console.SetCursorPosition(0, 0);
+            Console.CursorVisible = false;
 
+            runGenerations(Generations);
+            Console.SetCursorPosition(2, MaxY + 2);
+        }
+
+        int getNumber()
+        {
+            bool loop = true;
             while (loop == true)
             {
                 string Input = Console.ReadLine();
@@ -83,23 +78,20 @@ namespace Game_of_life
 
                 if (int.TryParse(Input, out Value))
                 {
-                    Generations = Convert.ToInt32(Input);
+                    
                     loop = false;
-                    Console.SetCursorPosition(0, 0);
-                    Console.CursorVisible = false;
+                    return Value;
                 }
                 else
                 {
                     Console.WriteLine("Invalid input. Please enter a valid integer.");
-
+                    
                 }
+
             }
-            
-            runGenerations(Generations);
+            return 0;
         }
-
-
-
+        //test
         // run the game for x generations
         void runGenerations(int generations)
         {
@@ -137,21 +129,26 @@ namespace Game_of_life
                     }
 
                 }
-                StringBuilder gameString = new StringBuilder();
-                for (int y = 0; y < MaxY; y++)
-                {
-                    for (int x = 0; x < MaxX; x++)
-                    {
-                        gameString.Append(TempBoard[x, y] ? "█" : "▒");
-                    }
-
-                    gameString.AppendLine();
-                }
+                printBoard(TempBoard);
                 copyBoard(TempBoard, GameBoard);
                 Console.SetCursorPosition(0, 0);
-                Console.WriteLine(gameString.ToString());
                 Thread.Sleep(500);
             }
+        }
+
+        void printBoard(bool[,] board)
+        {
+            StringBuilder gameString = new StringBuilder();
+            for (int y = 0; y < MaxY; y++)
+            {
+                for (int x = 0; x < MaxX; x++)
+                {
+                    gameString.Append(board[x, y] ? "█" : "▒");
+                }
+
+                gameString.AppendLine();
+            }
+            Console.WriteLine(gameString.ToString());
         }
 
          void copyBoard(bool[,] source, bool[,] destination)
