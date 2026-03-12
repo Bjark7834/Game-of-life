@@ -6,11 +6,11 @@ using System.Threading;
 
 namespace Game_of_life
 {
-    public class GameCode
+    public partial class GameCode
     {
 
-        bool[,] GameBoard = new bool[ProgramState.MaxX, ProgramState.MaxY];
-        bool[,] TempBoard = new bool[ProgramState.MaxX, ProgramState.MaxY];
+        bool[,] GameBoard = new bool[MaxX, MaxY];
+        bool[,] TempBoard = new bool[MaxX, MaxY];
         Random rnd = new Random();
         bool boolvalue;
         int ForT = 1;
@@ -38,8 +38,8 @@ namespace Game_of_life
 
 
             // initialize the game board with a set number of random alive cells
-            int placed = initializeRandomAlive(ProgramState.startAlive);
-            Console.SetCursorPosition(0, ProgramState.MaxY);
+            int placed = initializeRandomAlive(StartAlive);
+            Console.SetCursorPosition(0, MaxY);
             Console.WriteLine($"Placed {placed} alive cells");
             Console.SetCursorPosition(0, 0);
             Thread.Sleep(800);
@@ -61,23 +61,23 @@ namespace Game_of_life
 
 
             // reference the program-wide setting from ProgramState
-            if (ProgramState.askGen == true)
+            if (AskGen == true)
             {
                 Console.WriteLine("Enter number of Generations");
                 Generations = getNumber();
             }
             else
             {
-                Console.WriteLine($"Press any key to run for {ProgramState.Gens} generations");
+                Console.WriteLine($"Press any key to run for {Gens} generations");
                 Console.ReadKey();
-                Generations = ProgramState.Gens;
+                Generations = Gens;
             }
 
             Console.SetCursorPosition(0, 0);
             Console.CursorVisible = false;
 
             runGenerations(Generations);
-            Console.SetCursorPosition(2, ProgramState.MaxY + 2);
+            Console.SetCursorPosition(2, MaxY + 2);
         }
 
         int getNumber()
@@ -110,9 +110,9 @@ namespace Game_of_life
             for (int gen = 0; gen < generations; gen++)
             {
 
-                for (int y = 0; y < ProgramState.MaxY; y++)
+                for (int y = 0; y < MaxY; y++)
                 {
-                    for (int x = 0; x < ProgramState.MaxX; x++)
+                    for (int x = 0; x < MaxX; x++)
                     {
                         int Neighbor = countNeighbors(GameBoard, x, y);
                         if (GameBoard[x, y])
@@ -137,11 +137,11 @@ namespace Game_of_life
         void printBoard(bool[,] board)
         {
             StringBuilder gameString = new StringBuilder();
-            for (int y = 0; y < ProgramState.MaxY; y++)
+            for (int y = 0; y < MaxY; y++)
             {
-                for (int x = 0; x < ProgramState.MaxX; x++)
+                for (int x = 0; x < MaxX; x++)
                 {
-                    gameString.Append(board[x, y] ? ProgramState.aliveChar : ProgramState.deadChar);
+                    gameString.Append(board[x, y] ? AliveChar : DeadChar);
                 }
 
                 gameString.AppendLine();
@@ -151,9 +151,9 @@ namespace Game_of_life
 
         void copyBoard(bool[,] source, bool[,] destination)
         {
-            for (int y = 0; y < ProgramState.MaxY; y++)
+            for (int y = 0; y < MaxY; y++)
             {
-                for (int x = 0; x < ProgramState.MaxX; x++)
+                for (int x = 0; x < MaxX; x++)
                 {
                     destination[x, y] = source[x, y];
                 }
@@ -172,7 +172,7 @@ namespace Game_of_life
                         if (i == 0 && j == 0) continue; // Skip the current cell
                         int neighborX = x + i;
                         int neighborY = y + j;
-                        if (neighborX >= 0 && neighborX < ProgramState.MaxX && neighborY >= 0 && neighborY < ProgramState.MaxY)
+                        if (neighborX >= 0 && neighborX < MaxX && neighborY >= 0 && neighborY < MaxY)
                         {
                             if (board[neighborX, neighborY]) count++;
                         }
@@ -186,17 +186,17 @@ namespace Game_of_life
         int initializeRandomAlive(int count)
         {
             // clear board first
-            for (int y = 0; y < ProgramState.MaxY; y++)
-                for (int x = 0; x < ProgramState.MaxX; x++)
+            for (int y = 0; y < MaxY; y++)
+                for (int x = 0; x < MaxX; x++)
                     GameBoard[x, y] = false;
 
-            int maxCells = ProgramState.MaxX * ProgramState.MaxY;
+            int maxCells = MaxX * MaxY;
             if (count <= 0) return 0;
             if (count >= maxCells)
             {
                 // fill all
-                for (int y = 0; y < ProgramState.MaxY; y++)
-                    for (int x = 0; x < ProgramState.MaxX; x++)
+                for (int y = 0; y < MaxY; y++)
+                    for (int x = 0; x < MaxX; x++)
                         GameBoard[x, y] = true;
                 return maxCells;
             }
@@ -218,8 +218,8 @@ namespace Game_of_life
             for (int k = 0; k < count; k++)
             {
                 int idx = indices[k];
-                int x = idx % ProgramState.MaxX;
-                int y = idx / ProgramState.MaxX;
+                int x = idx % MaxX;
+                int y = idx / MaxX;
                 GameBoard[x, y] = true;
             }
 
