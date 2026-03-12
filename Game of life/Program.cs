@@ -4,45 +4,34 @@ using System.Text;
 
 namespace Game_of_life
 {
-    public partial class GameCode
-    {
-
-        // if true, the program will ask the user how many generations to run
-        public bool AskGen = true;
-
-
-        // if askGen is false, the program will use this value for the number of generations to run
-        public int Gens = 25;
-
-
-        // the character used to represent alive cells
-        public string AliveChar = "█";
-
-
-        // the character used to represent dead cells
-        public string DeadChar = "▒";
-
-
-        // the number of randomly selected alive cells to start with
-        //doesnt work well with too high or too low values
-        public int StartAlive = 1500;
-
-
-        // the size of the game board
-        //setting x too high will cause the console to wrap around
-        public const int MaxX = 100;
-        public const int MaxY = 20;
-
-
-    }
-
 
     public static class Program
     {
         public static void Main()
         {
-            GameCode game = new GameCode();
-            game.run();
+            GameCode game1 = new GameCode();
+            GameCode game2 = new GameCode();
+            GameCode game3 = new GameCode();
+
+
+            game1.AskGen = true;
+            game1.run();
+
+
+            game2.GenTime = 100;
+            game2.Gens = 40;
+            game2.StartAlive = 800;
+            game2.AliveChar = "X";
+            game2.DeadChar = " ";
+            game2.run();
+
+
+            game3.AutoRun = false;
+            game3.AskGen = true;
+            game3.StartAlive = 400;
+            game3.AliveChar = "o";
+            game3.DeadChar = ".";
+            game3.run();
         }
     }
 }

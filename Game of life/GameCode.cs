@@ -6,8 +6,42 @@ using System.Threading;
 
 namespace Game_of_life
 {
-    public partial class GameCode
+    public class GameCode
     {
+
+        // if true, the program will ask the user how many generations to run
+        public bool AskGen { get; set; } = false;
+
+
+        // if askGen is false, the program will use this value for the number of generations to run
+        public int Gens { get; set; } = 25;
+
+
+        // the character used to represent alive cells
+        public string AliveChar { get; set; } = "█";
+
+
+        // the character used to represent dead cells
+        public string DeadChar { get; set; } = "▒";
+
+
+        // the number of randomly selected alive cells to start with
+        //doesnt work well with too high or too low values
+        public int StartAlive { get; set; } = 1500;
+
+
+        //sets time between generations in milliseconds
+        public int GenTime { get; set; } = 500;
+
+
+        //sets if generations should run automatically or wait for user input between each generation
+        public bool AutoRun { get; set; } = true;
+
+        // the size of the game board
+        //setting x too high will cause the console to wrap around
+        const int MaxX = 100;
+        const int MaxY = 20;
+
 
         bool[,] GameBoard = new bool[MaxX, MaxY];
         bool[,] TempBoard = new bool[MaxX, MaxY];
@@ -20,8 +54,8 @@ namespace Game_of_life
 
         public void run()
         {
-            
-            
+            TrueClear();
+            Console.CursorVisible = true;
             // initialize the game board with random values
             /*
             for (int y = 0; y < ProgramState.MaxY; y++)
@@ -42,7 +76,6 @@ namespace Game_of_life
             Console.SetCursorPosition(0, MaxY);
             Console.WriteLine($"Placed {placed} alive cells");
             Console.SetCursorPosition(0, 0);
-            Thread.Sleep(800);
 
 
             //flying machine
@@ -60,7 +93,7 @@ namespace Game_of_life
 
 
 
-            // reference the program-wide setting from ProgramState
+            // check if program should ask for generations or use the default value
             if (AskGen == true)
             {
                 Console.WriteLine("Enter number of Generations");
@@ -73,11 +106,16 @@ namespace Game_of_life
                 Generations = Gens;
             }
 
+            TrueClear();
+            printBoard(GameBoard);
             Console.SetCursorPosition(0, 0);
             Console.CursorVisible = false;
-
             runGenerations(Generations);
+            TrueClear();
+            printBoard(GameBoard);
             Console.SetCursorPosition(2, MaxY + 2);
+            Console.Write("Simulation complete. Press any key to exit or continue to next.");
+            Console.ReadKey();
         }
 
         int getNumber()
@@ -127,10 +165,22 @@ namespace Game_of_life
 
                 }
                 printBoard(TempBoard);
+                Console.SetCursorPosition(2, MaxY + 2);
+                Console.WriteLine($"Generation {gen + 1}/{generations}");
                 copyBoard(TempBoard, GameBoard);
-                Console.SetCursorPosition(0, 0);
-                Thread.Sleep(500);
                 
+                if (!AutoRun)
+                {
+                    Console.WriteLine("Press any key to continue to the next generation...");
+                    Console.ReadKey();
+                }
+                else
+                {
+                    int time = GenTime;
+                    Thread.Sleep(time);
+                }
+                Console.SetCursorPosition(0, 0);
+
             }
         }
         //generate random game board and print it to the console
@@ -161,6 +211,12 @@ namespace Game_of_life
         }
 
 
+        void TrueClear()
+        {
+            Console.Clear();
+            Console.WriteLine("\x1b[3J");
+            Console.Clear();
+        }
 
              int countNeighbors(bool[,] board, int x, int y)
             {
@@ -180,6 +236,7 @@ namespace Game_of_life
                 }
                 return count;
             }
+
 
         // place exactly `count` alive cells at random distinct positions on the board
         // Uses a Fisher-Yates shuffle to pick `count` distinct indices efficiently and deterministically.
