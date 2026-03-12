@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 
@@ -7,26 +8,25 @@ namespace Game_of_life
 {
     public class GameCode
     {
-        const int MaxX = 100;
-        const int MaxY = 20;
 
-        bool[,] GameBoard = new bool[MaxX, MaxY];
-        bool[,] TempBoard = new bool[MaxX, MaxY];
+        bool[,] GameBoard = new bool[ProgramState.MaxX, ProgramState.MaxY];
+        bool[,] TempBoard = new bool[ProgramState.MaxX, ProgramState.MaxY];
         Random rnd = new Random();
         bool boolvalue;
         int ForT = 1;
-        
+
         int Generations = 0;
+        
 
         public void run()
         {
             
             
             // initialize the game board with random values
-            
-            for (int y = 0; y < MaxY; y++)
+            /*
+            for (int y = 0; y < ProgramState.MaxY; y++)
             {
-                for (int x = 0; x < MaxX; x++)
+                for (int x = 0; x < ProgramState.MaxX; x++)
                 {
 
                     ForT = rnd.Next(2);
@@ -34,7 +34,15 @@ namespace Game_of_life
                     GameBoard[x, y] = boolvalue;
                 }
             }
-            
+            */
+
+
+            // initialize the game board with a set number of random alive cells
+            int placed = initializeRandomAlive(ProgramState.startAlive);
+            Console.SetCursorPosition(0, ProgramState.MaxY);
+            Console.WriteLine($"Placed {placed} alive cells");
+            Console.SetCursorPosition(0, 0);
+            Thread.Sleep(800);
 
 
             //flying machine
@@ -52,14 +60,24 @@ namespace Game_of_life
 
 
 
+            // reference the program-wide setting from ProgramState
+            if (ProgramState.askGen == true)
+            {
+                Console.WriteLine("Enter number of Generations");
+                Generations = getNumber();
+            }
+            else
+            {
+                Console.WriteLine($"Press any key to run for {ProgramState.Gens} generations");
+                Console.ReadKey();
+                Generations = ProgramState.Gens;
+            }
 
-            Console.WriteLine("Enter number of Generations");
-            Generations = getNumber();
             Console.SetCursorPosition(0, 0);
             Console.CursorVisible = false;
 
             runGenerations(Generations);
-            Console.SetCursorPosition(2, MaxY + 2);
+            Console.SetCursorPosition(2, ProgramState.MaxY + 2);
         }
 
         int getNumber()
@@ -92,9 +110,9 @@ namespace Game_of_life
             for (int gen = 0; gen < generations; gen++)
             {
 
-                for (int y = 0; y < MaxY; y++)
+                for (int y = 0; y < ProgramState.MaxY; y++)
                 {
-                    for (int x = 0; x < MaxX; x++)
+                    for (int x = 0; x < ProgramState.MaxX; x++)
                     {
                         int Neighbor = countNeighbors(GameBoard, x, y);
                         if (GameBoard[x, y])
@@ -119,11 +137,11 @@ namespace Game_of_life
         void printBoard(bool[,] board)
         {
             StringBuilder gameString = new StringBuilder();
-            for (int y = 0; y < MaxY; y++)
+            for (int y = 0; y < ProgramState.MaxY; y++)
             {
-                for (int x = 0; x < MaxX; x++)
+                for (int x = 0; x < ProgramState.MaxX; x++)
                 {
-                    gameString.Append(board[x, y] ? "█" : "▒");
+                    gameString.Append(board[x, y] ? ProgramState.aliveChar : ProgramState.deadChar);
                 }
 
                 gameString.AppendLine();
@@ -133,9 +151,9 @@ namespace Game_of_life
 
         void copyBoard(bool[,] source, bool[,] destination)
         {
-            for (int y = 0; y < MaxY; y++)
+            for (int y = 0; y < ProgramState.MaxY; y++)
             {
-                for (int x = 0; x < MaxX; x++)
+                for (int x = 0; x < ProgramState.MaxX; x++)
                 {
                     destination[x, y] = source[x, y];
                 }
@@ -154,7 +172,7 @@ namespace Game_of_life
                         if (i == 0 && j == 0) continue; // Skip the current cell
                         int neighborX = x + i;
                         int neighborY = y + j;
-                        if (neighborX >= 0 && neighborX < MaxX && neighborY >= 0 && neighborY < MaxY)
+                        if (neighborX >= 0 && neighborX < ProgramState.MaxX && neighborY >= 0 && neighborY < ProgramState.MaxY)
                         {
                             if (board[neighborX, neighborY]) count++;
                         }
@@ -162,5 +180,50 @@ namespace Game_of_life
                 }
                 return count;
             }
+
+        // place exactly `count` alive cells at random distinct positions on the board
+        // Uses a Fisher-Yates shuffle to pick `count` distinct indices efficiently and deterministically.
+        int initializeRandomAlive(int count)
+        {
+            // clear board first
+            for (int y = 0; y < ProgramState.MaxY; y++)
+                for (int x = 0; x < ProgramState.MaxX; x++)
+                    GameBoard[x, y] = false;
+
+            int maxCells = ProgramState.MaxX * ProgramState.MaxY;
+            if (count <= 0) return 0;
+            if (count >= maxCells)
+            {
+                // fill all
+                for (int y = 0; y < ProgramState.MaxY; y++)
+                    for (int x = 0; x < ProgramState.MaxX; x++)
+                        GameBoard[x, y] = true;
+                return maxCells;
+            }
+
+            // build index array
+            int[] indices = new int[maxCells];
+            for (int i = 0; i < maxCells; i++) indices[i] = i;
+
+            // Fisher-Yates partial shuffle: shuffle first `count` positions
+            for (int i = 0; i < count; i++)
+            {
+                int j = rnd.Next(i, maxCells);
+                int tmp = indices[i];
+                indices[i] = indices[j];
+                indices[j] = tmp;
+            }
+
+            // set the first `count` indices to alive
+            for (int k = 0; k < count; k++)
+            {
+                int idx = indices[k];
+                int x = idx % ProgramState.MaxX;
+                int y = idx / ProgramState.MaxX;
+                GameBoard[x, y] = true;
+            }
+
+            return count;
+        }
     }
 }
