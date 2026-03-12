@@ -12,7 +12,6 @@ namespace Game_of_life
 
         bool[,] GameBoard = new bool[MaxX, MaxY];
         bool[,] TempBoard = new bool[MaxX, MaxY];
-        // use time-based seed so the board is different each run
         Random rnd = new Random();
         bool boolvalue;
         int ForT = 1;
@@ -30,8 +29,6 @@ namespace Game_of_life
                 for (int x = 0; x < MaxX; x++)
                 {
 
-
-                    // rnd.Next(1) returns only 0. Use 2 to get 0 or 1.
                     ForT = rnd.Next(2);
                     boolvalue = ForT == 1;
                     GameBoard[x, y] = boolvalue;
@@ -100,15 +97,12 @@ namespace Game_of_life
                     for (int x = 0; x < MaxX; x++)
                     {
                         int Neighbor = countNeighbors(GameBoard, x, y);
-                        // rules of Conway's Game of Life
                         if (GameBoard[x, y])
                         {
-                            // live cell survives only with 2 or 3 neighbors
                             TempBoard[x, y] = (Neighbor == 2 || Neighbor == 3);
                         }
                         else
                         {
-                            // dead cell becomes alive only with exactly 3 neighbors
                             TempBoard[x, y] = (Neighbor == 3);
                         }
                     }
@@ -137,16 +131,16 @@ namespace Game_of_life
             Console.WriteLine(gameString.ToString());
         }
 
-         void copyBoard(bool[,] source, bool[,] destination)
+        void copyBoard(bool[,] source, bool[,] destination)
+        {
+            for (int y = 0; y < MaxY; y++)
             {
-                for (int y = 0; y < MaxY; y++)
+                for (int x = 0; x < MaxX; x++)
                 {
-                    for (int x = 0; x < MaxX; x++)
-                    {
-                        destination[x, y] = source[x, y];
-                    }
+                    destination[x, y] = source[x, y];
                 }
             }
+        }
 
 
 
